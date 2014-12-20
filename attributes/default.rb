@@ -37,5 +37,4 @@ default['frontaccounting']['company'][0]['companyname'] = 'Sample Company, Inc.'
 default['frontaccounting']['company'][0]['dbhost'] = 'localhost'
 default['frontaccounting']['company'][0]['dbname'] = 'frontacc'
 default['frontaccounting']['company'][0]['dbuser'] = 'frontacc'
-default['frontaccounting']['company'][0]['dbpassword'] = 'frontacc'
 
