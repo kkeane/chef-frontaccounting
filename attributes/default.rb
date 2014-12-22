@@ -33,8 +33,16 @@ default['frontaccounting']['servername'] = node['fqdn']
 default['frontaccounting']['fileuser'] = 'root'
 default['frontaccounting']['filegroup'] = 'apache'
 
-default['frontaccounting']['company'][0]['companyname'] = 'Sample Company, Inc.'
-default['frontaccounting']['company'][0]['dbhost'] = 'localhost'
-default['frontaccounting']['company'][0]['dbname'] = 'frontacc'
-default['frontaccounting']['company'][0]['dbuser'] = 'frontacc'
+default['frontaccounting']['company']['companyname'] = 'Sample Company, Inc.'
+default['frontaccounting']['company']['dbhost'] = 'localhost'
+default['frontaccounting']['company']['dbname'] = 'frontacc'
+default['frontaccounting']['company']['dbuser'] = 'frontacc'
+
+default['frontaccounting']['lang']['C']['name'] = "US English"
+default['frontaccounting']['lang']['C']['encoding'] = "iso-8859-1"
+
+# Frontaccounting needs to connect to install extensions/coas/languages etc.,
+# and also to connect to a remote MySQL server.
+override['selinux']['booleans']['httpd_can_network_connect'] = "on"
+override['selinux']['booleans']['httpd_can_network_connect_db'] = "on"
 

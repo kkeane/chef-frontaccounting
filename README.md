@@ -4,7 +4,7 @@ Installes FrontAccounting (http://www.frontaccounting.com)
 
 ## Supported Platforms
 
-CentOS. Other platforms may work with different attributes
+CentOS. Other platforms may work.
 
 ## Attributes
 
@@ -51,10 +51,10 @@ CentOS. Other platforms may work with different attributes
     <td>Information about each company in the Frontaccounting database. Note that
 the password is not included here; you must pass the passwords using node.run_state
 instead.</td>
-    <td><tt>[0]['companyname'] = "Sample Company Inc."<br/>
-            [0]['dbhost'] = "localhost"<br/>
-            [0]['dbname'] = "frontacc"<br/>
-            [0]['dbuser'] = "frontacc"<br/></tt></td>
+    <td><tt>['companyname'] = "Sample Company Inc."<br/>
+            ['dbhost'] = "localhost"<br/>
+            ['dbname'] = "frontacc"<br/>
+            ['dbuser'] = "frontacc"<br/></tt></td>
   </tr>
 </table>
 
@@ -67,15 +67,7 @@ Set up a Web server, for instance using the httpd cookbook.
 Set any attributes you need as non-default. Specify the database password using the
 node.run_state[:frontaccounting_dbpw] mechanism:
 
-If all companies use the same password, use this:
-
 <code>node.run_state[:frontaccounting_dbpw] = 'password'</code>
-
-If the companies need different database passwords, pass an array. The index for each
-password must match the index for the corresponding company information in the
-node['frontaccounting']['company'] attribute array.
-
-<code>node.run_state[:frontaccounting_dbpw] = [ 'password1', 'password2' ]</code>
 
 Include `frontaccounting` in your node's `run_list`:
 
@@ -86,6 +78,21 @@ Include `frontaccounting` in your node's `run_list`:
   ]
 }
 ```
+
+After this cookbook is installed, FrontAccounting will have a single company. The COA,
+user names and passwords come from the database en_US-demo.sql that are shipped with
+FrontAccounting. As of this writing, the initial user names and passwords are:
+
+<table>
+ <tr>
+  <td>admin</td><td>password</td>
+ </tr>
+ <tr>
+  <td>demouser</td><td>password</td>
+ </tr>
+</table>
+
+You should immediately change the user names and passwords for these users.
 
 ## License and Authors
 

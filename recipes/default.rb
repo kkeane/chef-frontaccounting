@@ -19,6 +19,8 @@
 #
 
 include_recipe "php"
+package "php-mysql"
+include_recipe "mysql::client"
 
 passwords = Chef::EncryptedDataBagItem.load("passwords", "servers")
 
@@ -39,30 +41,32 @@ end
 
 fqdn = node['frontaccounting']['servername']
 
+remote_file "#{Chef::Config[:file_cache_path]}/#{downloadfile}" do
+  action :create_if_missing
+  source downloadurl
+  backup 0
+end
+
 bash "unpack frontaccounting" do
-  action :nothing
+  action :run
   code "
 tar xfz #{Chef::Config[:file_cache_path]}/#{downloadfile} -C #{basedir} --strip-components=1
 chown -R #{fileuser}:#{filegroup} #{basedir}
 "
-end
-
-remote_file "#{Chef::Config[:file_cache_path]}/#{downloadfile}" do
-  action :create_if_missing
-  source downloadurl
-  notifies :run, "bash[unpack frontaccounting]", :immediate
-  backup 0
+  not_if {File.exists?("#{basedir}/index.php")}
 end
 
 # Clean up a few files and directories that are not needed and might constitute security
 # concerns.
-%w{ install.html update.html CHANGELOG.txt config.default.php }.each do |f|
+%w{ install.html update.html config.default.php }.each do |f|
   file "#{basedir}/#{f}" do
     action :delete
   end
 end
 
 # The install directory must be deleted for security reasons.
+# It is not needed because this cookbook does the same things as
+# the install wizard would ordinarily do
 directory "#{basedir}/install" do
   action :delete
   recursive true
@@ -70,7 +74,39 @@ end
 
 # Configure FrontAccounting. Once these files are created, don't touch them
 # because FrontAccounting may have updated them.
-%w{ config.php installed_extensions.php }.each do |f|
+password = node.run_state[:frontaccounting_dbpw]
+
+defaultcompany = {}
+%w{ companyname dbhost dbname dbuser }.each do |attrname|
+  defaultcompany[attrname] = node['frontaccounting']['company'][attrname]
+end
+defaultcompany['dbpassword'] = password
+
+# Create the database for company 0
+# This is not by itself idempotent, but triggered by a notifies to
+# avoid overwriting an existing database.
+bash "import frontaccounting database" do
+  action :nothing
+  code "mysql -h #{defaultcompany['dbhost']} -u #{defaultcompany['dbuser']} '--password=#{defaultcompany['dbpassword']}' #{defaultcompany['dbname']} < #{basedir}/sql/en_US-demo.sql
+"
+end
+
+#############################################################
+# Initial setup of the various configuration files.
+# IMPORTANT: always use action create_if_missing since
+# FrontAccounting will later update most of these files
+# with new information!
+#
+%w{ 0 0/images 0/pdf_files 0/backup 0/js_cache}.each do |csubdir|
+  directory "#{basedir}/company/#{csubdir}" do
+    owner fileuser
+    group filegroup
+    mode  "0770"
+  end
+end
+
+# Files with permission 440
+%w{ config.php }.each do |f|
   template "#{basedir}/#{f}" do
     action :create_if_missing
     source "#{f}.erb"
@@ -80,31 +116,27 @@ end
   end
 end
 
-
-companies=node['frontaccounting']['company']
-
-passwords = node.run_state[:frontaccounting_dbpw]
-
-# Insert the password into the companydata
-companydata = companies.map do |index,company|
-  # puts company
-  # puts index
-  new = {}
-  new['index'] = index
-  %w{ companyname dbhost dbname dbuser }.each do |attrname|
-    new[attrname] = company[attrname]
+# Files with permission 660
+%w{ installed_extensions.php company/0/installed_extensions.php lang/installed_languages.inc config_db.php }.each do |f|
+  fname = File.basename(f)
+  template "#{basedir}/#{f}.php" do
+    action :create_if_missing
+    source "#{fname}.erb"
+    owner fileuser
+    group filegroup
+    mode  "0660"
+    variables(
+      :companydata => defaultcompany,
+      :languages => node['frontaccounting']['lang']
+    )
+    notifies :run, "bash[import frontaccounting database]", :immediate
   end
-  new['dbpassword'] = passwords.is_a?(Array) ? passwords[index] : passwords
-  new
 end
 
-template "#{basedir}/config_db.php" do
-  source "config_db.php.erb"
+file "#{basedir}/tmp/faillog.php" do
+  action :create_if_missing
   owner fileuser
   group filegroup
-  mode  "0440"
-  variables(
-    :companydata => companydata
-  )
+  mode  "0660"
 end
 

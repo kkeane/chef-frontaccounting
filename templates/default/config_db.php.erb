@@ -1,18 +1,13 @@
 <?php
 $def_coy = 0;
-$tb_pref_counter = <%= @companydata.count %>;
+$tb_pref_counter = 1;
 $db_connections = array (
-<%
-  separator = ''
-  @companydata.each do |data|
-%>
-<%= separator %><% separator = ',' %>
-    <%=data['index']%> => array ( 'name'       => '<%= data['companyname'] %>',
-                 'host'       => '<%= data['dbhost'] %>',
-                 'dbuser'     => '<%= data['dbuser'] %>',
-                 'dbpassword' => '<%= data['dbpassword'] %>',
-                 'dbname'     => '<%= data['dbname'] %>',
-                 'tbpref'     => '<%= data['index'] %>_')<% end %>
+    0 => array ( 'name'       => '<%= @companydata['companyname'] %>',
+                 'host'       => '<%= @companydata['dbhost'] %>',
+                 'dbuser'     => '<%= @companydata['dbuser'] %>',
+                 'dbpassword' => '<%= @companydata['dbpassword'] %>',
+                 'dbname'     => '<%= @companydata['dbname'] %>',
+                 'tbpref'     => '0_')
 );
 ?> 
 
