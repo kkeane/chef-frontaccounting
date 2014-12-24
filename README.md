@@ -4,7 +4,7 @@ Installes FrontAccounting (http://www.frontaccounting.com)
 
 ## Supported Platforms
 
-CentOS. Other platforms may work.
+Tested on CentOS 6.6. Other platforms may work, possibly with some modifications.
 
 ## Attributes
 
@@ -62,10 +62,12 @@ instead.</td>
 
 ### frontaccounting::default
 
-Set up a Web server, for instance using the httpd cookbook.
+Set up a Web server, for instance using the httpd cookbook. If you are using nginx or
+other servers, you may need additional work to make php work.
 
-Set any attributes you need as non-default. Specify the database password using the
-node.run_state[:frontaccounting_dbpw] mechanism:
+Set any attributes you need as non-default.
+
+Specify the database password using the node.run_state[:frontaccounting_dbpw] mechanism:
 
 <code>node.run_state[:frontaccounting_dbpw] = 'password'</code>
 
