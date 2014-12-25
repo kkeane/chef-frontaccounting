@@ -11,8 +11,7 @@ version          '1.0.0'
 end
 
 depends 'php'
-# We don't actually need the mysql cookbook, but the php cookbook
-# includes it, and version 6.0.3 will cause a conflict that causes
-# httpd to be misconfigured.
+# The 6.0 mysql cookbook has some breaking changes that the frontaccounting
+# cookbook does not (yet) account for.
 depends 'mysql', '< 6.0'
 
