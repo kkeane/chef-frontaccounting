@@ -2,7 +2,7 @@
 # Cookbook Name:: frontaccounting
 # Recipe:: default
 #
-# Copyright (C) 2014 North County Tech Center, LLC
+# Copyright (C) 2014-2015 North County Tech Center, LLC
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 include_recipe "php"
 package "php-mysql"
 include_recipe "mysql::client"
-
-passwords = Chef::EncryptedDataBagItem.load("passwords", "servers")
 
 downloadurl=node['frontaccounting']['downloadurl']
 version=node['frontaccounting']['version']
@@ -119,7 +117,7 @@ end
 # Files with permission 660
 %w{ installed_extensions.php company/0/installed_extensions.php lang/installed_languages.inc config_db.php }.each do |f|
   fname = File.basename(f)
-  template "#{basedir}/#{f}.php" do
+  template "#{basedir}/#{f}" do
     action :create_if_missing
     source "#{fname}.erb"
     owner fileuser

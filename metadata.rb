@@ -4,7 +4,7 @@ maintainer_email 'kkeane@4nettech.com'
 license          'GNU Public License 3.0'
 description      'Installs/Configures frontaccounting'
 long_description 'Installs/Configures the accounting package FrontAccounting.'
-version          '1.0.0'
+version          '1.0.1'
 
 %w{ centos }.each do |os|
   supports os
