@@ -11,5 +11,5 @@ version          '1.1.0'
 end
 
 depends 'php'
-depends 'mysql', '>= 6'
+depends 'mysql', '> 6.0'
 
