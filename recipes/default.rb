@@ -22,7 +22,7 @@ include_recipe "php"
 package "php-mysql"
 
 mysql_client 'default' do
-  action :install
+  action :create
 end
 
 downloadurl=node['frontaccounting']['downloadurl']
