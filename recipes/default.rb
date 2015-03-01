@@ -20,7 +20,10 @@
 
 include_recipe "php"
 package "php-mysql"
-include_recipe "mysql::client"
+
+mysql_client 'default' do
+  action :install
+end
 
 downloadurl=node['frontaccounting']['downloadurl']
 version=node['frontaccounting']['version']
@@ -32,6 +35,9 @@ documentroot=node['frontaccounting']['documentroot']
 basedir="#{documentroot}#{baseurl}"
 fileuser=node['frontaccounting']['fileuser']
 filegroup=node['frontaccounting']['filegroup']
+
+# If SELinux is enabled, Apache needs to be allowed to send emails.
+node.set['selinux']['booleans']["httpd_can_sendmail"] = "on"
 
 directory basedir do
   recursive true
